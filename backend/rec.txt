@@ -1,5 +1,4 @@
     python -m venv venv
-    
     pip install Django
     pip install djangorestframework
     pip install mongoengine 

@@ -18,227 +18,362 @@ function RegistrationForm() {
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
 
+  const steps = [
+    { number: 1, title: "Personal Information" },
+    { number: 2, title: "Educational Details" },
+    { number: 3, title: "Additional Information" },
+  ];
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-6">
-      <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-2xl">
-        <h2 className="text-2xl font-semibold mb-4 text-center">
-          Step {step} of 3
-        </h2>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8">
+          <h1 className="text-3xl font-bold text-center mb-2">
+            Career Counseling Registration
+          </h1>
+          <p className="text-blue-100 text-center">
+            Join us to discover your perfect career path
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {step === 1 && (
-            <>
-              <div>
-                <label>Full Name</label>
-                <input
-                  {...register("full_name", {
-                    required: "Full Name is required",
-                  })}
-                  className="input"
-                />
-                {errors.full_name && (
-                  <p className="text-red-500">{errors.full_name.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label>Email</label>
-                <input
-                  type="email"
-                  {...register("email", {
-                    required: "Email is required",
-                    pattern: {
-                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                      message: "Invalid email format",
-                    },
-                  })}
-                  className="input"
-                />
-                {errors.email && (
-                  <p className="text-red-500">{errors.email.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label>Mobile</label>
-                <input
-                  {...register("mobile", {
-                    required: "Mobile is required",
-                    pattern: {
-                      value: /^[6-9]\d{9}$/,
-                      message: "Enter valid mobile number",
-                    },
-                  })}
-                  className="input"
-                />
-                {errors.mobile && (
-                  <p className="text-red-500">{errors.mobile.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label>Password</label>
-                <input
-                  type="password"
-                  {...register("password", {
-                    required: "Password is required",
-                    minLength: { value: 6, message: "Minimum 6 characters" },
-                  })}
-                  className="input"
-                />
-                {errors.password && (
-                  <p className="text-red-500">{errors.password.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label>Age</label>
-                <input
-                  type="number"
-                  {...register("age", {
-                    required: "Age is required",
-                    min: { value: 13, message: "Min age 13" },
-                    max: { value: 100, message: "Max age 100" },
-                  })}
-                  className="input"
-                />
-                {errors.age && (
-                  <p className="text-red-500">{errors.age.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label>Gender</label>
-                <select
-                  {...register("gender", { required: "Gender is required" })}
-                  className="input"
+        {/* Progress Bar */}
+        <div className="px-8 pt-6">
+          <div className="flex items-center justify-between mb-8">
+            {steps.map((stepItem, index) => (
+              <div key={stepItem.number} className="flex items-center">
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${
+                    step >= stepItem.number
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 text-gray-500"
+                  }`}
                 >
-                  <option value="">Select</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
-                {errors.gender && (
-                  <p className="text-red-500">{errors.gender.message}</p>
+                  {stepItem.number}
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-gray-900">
+                    {stepItem.title}
+                  </p>
+                </div>
+                {index < steps.length - 1 && (
+                  <div
+                    className={`w-16 h-1 mx-4 ${
+                      step > stepItem.number ? "bg-blue-600" : "bg-gray-200"
+                    }`}
+                  />
                 )}
               </div>
-            </>
+            ))}
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="px-8 pb-8">
+          {step === 1 && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Full Name *
+                  </label>
+                  <input
+                    {...register("full_name", {
+                      required: "Full Name is required",
+                    })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Enter your full name"
+                  />
+                  {errors.full_name && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.full_name.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    {...register("email", {
+                      required: "Email is required",
+                      pattern: {
+                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                        message: "Invalid email format",
+                      },
+                    })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Enter your email"
+                  />
+                  {errors.email && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.email.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Mobile Number *
+                  </label>
+                  <input
+                    {...register("mobile", {
+                      required: "Mobile is required",
+                      pattern: {
+                        value: /^[6-9]\d{9}$/,
+                        message: "Enter valid mobile number",
+                      },
+                    })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Enter your mobile number"
+                  />
+                  {errors.mobile && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.mobile.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Age *
+                  </label>
+                  <input
+                    type="number"
+                    {...register("age", {
+                      required: "Age is required",
+                      min: { value: 13, message: "Min age 13" },
+                      max: { value: 100, message: "Max age 100" },
+                    })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Enter your age"
+                  />
+                  {errors.age && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.age.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Gender *
+                  </label>
+                  <select
+                    {...register("gender", { required: "Gender is required" })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  >
+                    <option value="">Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  {errors.gender && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.gender.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Password *
+                  </label>
+                  <input
+                    type="password"
+                    {...register("password", {
+                      required: "Password is required",
+                      minLength: { value: 6, message: "Minimum 6 characters" },
+                    })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Enter your password"
+                  />
+                  {errors.password && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.password.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
           )}
 
           {step === 2 && (
-            <>
-              <div>
-                <label>Education Level</label>
-                <select
-                  {...register("education_level", { required: true })}
-                  className="input"
-                >
-                  <option value="">Select</option>
-                  <option value="10th">10th</option>
-                  <option value="12th">12th</option>
-                  <option value="graduate">Graduate</option>
-                  <option value="postgraduate">Postgraduate</option>
-                </select>
-                {errors.education_level && (
-                  <p className="text-red-500">Education level is required</p>
-                )}
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Education Level *
+                  </label>
+                  <select
+                    {...register("education_level", { required: true })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  >
+                    <option value="">Select education level</option>
+                    <option value="10th">10th Standard</option>
+                    <option value="12th">12th Standard</option>
+                    <option value="graduate">Graduate</option>
+                    <option value="postgraduate">Postgraduate</option>
+                  </select>
+                  {errors.education_level && (
+                    <p className="text-red-500 text-sm mt-1">
+                      Education level is required
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Preferred Language *
+                  </label>
+                  <input
+                    {...register("preferred_language", { required: true })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="e.g., English, Hindi, etc."
+                  />
+                  {errors.preferred_language && (
+                    <p className="text-red-500 text-sm mt-1">
+                      Language is required
+                    </p>
+                  )}
+                </div>
               </div>
 
               <div>
-                <label>Preferred Language</label>
-                <input
-                  {...register("preferred_language", { required: true })}
-                  className="input"
-                />
-                {errors.preferred_language && (
-                  <p className="text-red-500">Language is required</p>
-                )}
-              </div>
-
-              <div>
-                <label>Career Interest</label>
-                <select
-                  {...register("career_interest", { required: true })}
-                  multiple
-                  className="input h-32"
-                >
-                  <option value="Engineering">Engineering</option>
-                  <option value="Entrepreneurship">Entrepreneurship</option>
-                  <option value="Government">Government</option>
-                  <option value="Medical">Medical</option>
-                </select>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Career Interests * (Select multiple)
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {[
+                    "Engineering",
+                    "Entrepreneurship",
+                    "Government",
+                    "Medical",
+                  ].map((interest) => (
+                    <label
+                      key={interest}
+                      className="flex items-center space-x-2 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        value={interest}
+                        {...register("career_interest", { required: true })}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700">{interest}</span>
+                    </label>
+                  ))}
+                </div>
                 {errors.career_interest && (
-                  <p className="text-red-500">Select at least one interest</p>
-                )}
-              </div>
-            </>
-          )}
-
-          {step === 3 && (
-            <>
-              <div>
-                <label>Location</label>
-                <input
-                  {...register("location", {
-                    required: "Location is required",
-                  })}
-                  className="input"
-                />
-                {errors.location && (
-                  <p className="text-red-500">{errors.location.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label>Profile Picture</label>
-                <input
-                  type="file"
-                  {...register("profile_picture", {
-                    validate: (files) => {
-                      const file = files?.[0];
-                      if (!file) return true;
-                      if (!["image/jpeg", "image/png"].includes(file.type))
-                        return "Only JPG/PNG allowed";
-                      if (file.size > 2 * 1024 * 1024) return "Max 2MB";
-                      return true;
-                    },
-                  })}
-                  className="input"
-                />
-                {errors.profile_picture && (
-                  <p className="text-red-500">
-                    {errors.profile_picture.message}
+                  <p className="text-red-500 text-sm mt-1">
+                    Select at least one interest
                   </p>
                 )}
               </div>
-            </>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Location *
+                  </label>
+                  <input
+                    {...register("location", {
+                      required: "Location is required",
+                    })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Enter your city/state"
+                  />
+                  {errors.location && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.location.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Profile Picture
+                  </label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors duration-200">
+                    <input
+                      type="file"
+                      {...register("profile_picture", {
+                        validate: (files) => {
+                          const file = files?.[0];
+                          if (!file) return true;
+                          if (!["image/jpeg", "image/png"].includes(file.type))
+                            return "Only JPG/PNG allowed";
+                          if (file.size > 2 * 1024 * 1024) return "Max 2MB";
+                          return true;
+                        },
+                      })}
+                      className="hidden"
+                      id="profile-picture"
+                    />
+                    <label htmlFor="profile-picture" className="cursor-pointer">
+                      <div className="text-gray-500">
+                        <svg
+                          className="mx-auto h-12 w-12 mb-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                          />
+                        </svg>
+                        <p className="text-sm">
+                          Click to upload profile picture
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          JPG, PNG up to 2MB
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+                  {errors.profile_picture && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.profile_picture.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
           )}
 
           {/* Navigation Buttons */}
-          <div className="flex justify-between pt-4">
+          <div className="flex justify-between items-center pt-8 border-t border-gray-200 mt-8">
             {step > 1 && (
               <button
                 type="button"
                 onClick={prevStep}
-                className="px-6 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-medium"
               >
-                Back
+                ← Previous
               </button>
             )}
             {step < 3 ? (
               <button
                 type="button"
                 onClick={nextStep}
-                className="ml-auto px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                className="ml-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg"
               >
-                Next
+                Next Step →
               </button>
             ) : (
               <button
                 type="submit"
-                className="ml-auto px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                className="ml-auto px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-200 font-medium shadow-lg"
               >
-                Submit
+                Complete Registration
               </button>
             )}
           </div>

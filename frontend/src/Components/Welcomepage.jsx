@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import bgsvg from "../assets/login_image.svg";
+import "../welcomepage.css";
 const WelcomePage = () => {
   const navigate = useNavigate();
   const [name, setname] = useState("");
@@ -27,7 +28,7 @@ const WelcomePage = () => {
     // Optional: Save to localStorage
     localStorage.setItem("user", JSON.stringify(decoded));
 
-    // Redirect to dashboard
+    // Redirect to signup
     navigate("/dashboard");
   };
   // const fetchData = async () => {

@@ -343,7 +343,7 @@ function RegistrationForm() {
                       {imgurl && imgurl !== "no file selected." ? (
                         <img
                           src={imgurl}
-                          alt="Profile Preview"
+                          alt="Click to upload profile picture"
                           className="mx-auto h-24 w-24 rounded-full object-cover"
                         />
                       ) : (

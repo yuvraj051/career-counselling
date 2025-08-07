@@ -10,3 +10,6 @@ npm install react-hook-form
 
 important website for designing
 https://tailwindflex.com/@sophia-baker/responsive-registration-form
+
+
+slider them page "file:///D:/JUSTPAGE/them/resonance.bestlooker.pro/main-one-page-slider-fullscreen.html"

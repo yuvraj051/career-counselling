@@ -9,16 +9,19 @@ const WelcomePage = () => {
   const [name, setname] = useState("");
   useEffect(() => {
     /* global google */
-    google.accounts.id.initialize({
-      client_id:
-        "1028542245103-arm2itofdrvbpeuo77r49cpkcj1kar73.apps.googleusercontent.com",
-      callback: handleLogin,
-    });
-
-    google.accounts.id.renderButton(
-      document.getElementById("google-button"),
-      {}
-    );
+    try {
+      google.accounts.id.initialize({
+        client_id:
+          "1028542245103-arm2itofdrvbpeuo77r49cpkcj1kar73.apps.googleusercontent.com",
+        callback: handleLogin,
+      });
+      google.accounts.id.renderButton(
+        document.getElementById("google-button"),
+        {}
+      );
+    } catch (error) {
+      alert("please check your network...");
+    }
   }, []);
 
   const handleLogin = (response) => {

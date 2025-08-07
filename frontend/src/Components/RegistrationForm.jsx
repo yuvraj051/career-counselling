@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 function RegistrationForm() {
@@ -10,6 +10,16 @@ function RegistrationForm() {
     formState: { errors },
   } = useForm();
 
+  const [txt_profile_picture, settxt_profile_picture] =
+    useState("please upload");
+
+  const [all, setall] = useState(watch());
+  useEffect(() => {
+    setall(watch());
+    settxt_profile_picture(watch("profile_picture"));
+  }, [watch]);
+
+  // const all = watch();
   const onSubmit = (data) => {
     console.log("Form Data:", data);
     alert("Registration Submitted!");
@@ -297,11 +307,20 @@ function RegistrationForm() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Profile Picture
+                    Profile Picture :-
+                    {
+                      JSON.stringify(
+                        txt_profile_picture
+                          ? txt_profile_picture
+                          : "please upload"
+                      )
+                      // .profile_picture[0]
+                    }
                   </label>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors duration-200">
                     <input
                       type="file"
+                      multiple={true}
                       {...register("profile_picture", {
                         validate: (files) => {
                           const file = files?.[0];

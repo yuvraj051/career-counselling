@@ -10,21 +10,28 @@ function RegistrationForm() {
     formState: { errors },
   } = useForm();
 
-  const [txt_profile_picture, settxt_profile_picture] =
-    useState("please upload");
-
-  const [all, setall] = useState(watch());
-  useEffect(() => {
-    setall(watch());
-    settxt_profile_picture(watch("profile_picture"));
-  }, [watch]);
-
+  // const [all, setall] = useState(watch());
+  const [imgurl, setimgurl] = useState("no file selected.");
   // const all = watch();
   const onSubmit = (data) => {
     console.log("Form Data:", data);
     alert("Registration Submitted!");
   };
 
+  const all = watch();
+
+  useEffect(() => {
+    const file = all.profile_picture?.[0];
+    if (file) {
+      setimgurl(file.name);
+    } else {
+      setimgurl("No file selected");
+    }
+  }, [all.profile_picture]);
+
+  // setimgurl(
+  //   all.profile_picture ? all.profile_picture[0].name : " No file selected"
+  // );
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
 
@@ -309,11 +316,9 @@ function RegistrationForm() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Profile Picture :-
                     {
-                      JSON.stringify(
-                        txt_profile_picture
-                          ? txt_profile_picture
-                          : "please upload"
-                      )
+                      imgurl
+
+                      // JSON.stringify(all.profile_picture[0].name)
                       // .profile_picture[0]
                     }
                   </label>

@@ -60,11 +60,10 @@ function RegistrationForm() {
             {steps.map((stepItem, index) => (
               <div key={stepItem.number} className="flex items-center">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${
-                    step >= stepItem.number
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-200 text-gray-500"
-                  }`}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${step >= stepItem.number
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200 text-gray-500"
+                    }`}
                 >
                   {stepItem.number}
                 </div>
@@ -75,9 +74,8 @@ function RegistrationForm() {
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`w-16 h-1 mx-4 ${
-                      step > stepItem.number ? "bg-blue-600" : "bg-gray-200"
-                    }`}
+                    className={`w-16 h-1 mx-4 ${step > stepItem.number ? "bg-blue-600" : "bg-gray-200"
+                      }`}
                   />
                 )}
               </div>
@@ -314,55 +312,62 @@ function RegistrationForm() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Profile Picture :-
-                    {
-                      imgurl
-
-                      // JSON.stringify(all.profile_picture[0].name)
-                      // .profile_picture[0]
-                    }
+                    Profile Picture:
                   </label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors duration-200">
-                    <input
-                      type="file"
-                      multiple={true}
-                      {...register("profile_picture", {
-                        validate: (files) => {
-                          const file = files?.[0];
-                          if (!file) return true;
-                          if (!["image/jpeg", "image/png"].includes(file.type))
-                            return "Only JPG/PNG allowed";
-                          if (file.size > 2 * 1024 * 1024) return "Max 2MB";
-                          return true;
-                        },
-                      })}
-                      className="hidden"
-                      id="profile-picture"
-                    />
-                    <label htmlFor="profile-picture" className="cursor-pointer">
-                      <div className="text-gray-500">
-                        <svg
-                          className="mx-auto h-12 w-12 mb-2"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                          />
-                        </svg>
-                        <p className="text-sm">
-                          Click to upload profile picture
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1">
-                          JPG, PNG up to 2MB
-                        </p>
-                      </div>
-                    </label>
-                  </div>
+
+                  <input
+                    type="file"
+                    id="profile-picture"
+                    {...register("profile_picture", {
+                      validate: (files) => {
+                        const file = files?.[0];
+                        if (!file) return true;
+                        if (!["image/jpeg", "image/png"].includes(file.type))
+                          return "Only JPG/PNG allowed";
+                        if (file.size > 2 * 1024 * 1024) return "Max 2MB";
+                        return true;
+                      },
+                    })}
+                    className="hidden"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setimgurl(URL.createObjectURL(file));
+                      }
+                    }}
+                  />
+
+                  <label htmlFor="profile-picture" className="cursor-pointer">
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors duration-200">
+                      {imgurl && imgurl !== "no file selected." ? (
+                        <img
+                          src={imgurl}
+                          alt="Profile Preview"
+                          className="mx-auto h-24 w-24 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="text-gray-500">
+                          <svg
+                            className="mx-auto h-12 w-12 mb-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                            />
+                          </svg>
+                          <p className="text-sm">Click to upload profile picture</p>
+                          <p className="text-xs text-gray-400 mt-1">JPG, PNG up to 2MB</p>
+                        </div>
+                      )}
+                    </div>
+                  </label>
+
                   {errors.profile_picture && (
                     <p className="text-red-500 text-sm mt-1">
                       {errors.profile_picture.message}

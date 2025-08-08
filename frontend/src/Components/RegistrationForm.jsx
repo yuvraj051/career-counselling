@@ -3,42 +3,57 @@ import { useForm } from "react-hook-form";
 
 function RegistrationForm() {
   const [step, setStep] = useState(1);
+  const [imgurl, setImgurl] = useState("no file selected.");
+
   const {
-    setValue,
     register,
     handleSubmit,
     watch,
+    trigger,
     formState: { errors },
-  } = useForm();
+  } = useForm({ mode: "onChange" });
 
-  // const [all, setall] = useState(watch());
-  const [imgurl, setimgurl] = useState("no file selected.");
-  // const all = watch();
+  const all = watch();
+
   const onSubmit = (data) => {
     console.log("Form Data:", data);
     alert("Registration Submitted!");
   };
 
-  const all = watch();
-
+  // Image Preview
   useEffect(() => {
-    // const file = all.profile_picture;
-    // console.log("from use efect :- ", file);
-    // if (file && file.length > 0) {
-    //   if (file) {
-    //     setimgurl(URL.createObjectURL(file));
-    //     console.log("has file");
-    //     console.log("imgurl :- ", imgurl);
-    //   } else {
-    //     setimgurl("No file selected.");
-    //   }
-    // }
+    const file = all.profile_picture?.[0];
+    if (file) {
+      setImgurl(URL.createObjectURL(file));
+    } else {
+      setImgurl("no file selected.");
+    }
   }, [all.profile_picture]);
 
-  // setimgurl(
-  //   all.profile_picture ? all.profile_picture[0].name : " No file selected"
-  // );
-  const nextStep = () => setStep((prev) => prev + 1);
+  // Step change with validation
+  const nextStep = async () => {
+    let currentStepFields = [];
+    if (step === 1)
+      currentStepFields = [
+        "full_name",
+        "email",
+        "mobile",
+        "age",
+        "gender",
+        "password",
+      ];
+    else if (step === 2)
+      currentStepFields = [
+        "education_level",
+        "preferred_language",
+        "career_interest",
+      ];
+    else if (step === 3) currentStepFields = ["location", "profile_picture"];
+
+    const isStepValid = await trigger(currentStepFields);
+    if (isStepValid) setStep((prev) => prev + 1);
+  };
+
   const prevStep = () => setStep((prev) => prev - 1);
 
   const steps = [
@@ -91,10 +106,13 @@ function RegistrationForm() {
           </div>
         </div>
 
+        {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="px-8 pb-8">
+          {/* Step 1 */}
           {step === 1 && (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Full Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Full Name *
@@ -102,8 +120,16 @@ function RegistrationForm() {
                   <input
                     {...register("full_name", {
                       required: "Full Name is required",
+                      pattern: {
+                        value: /^[A-Za-z\s]+$/,
+                        message: "Only alphabets allowed",
+                      },
+                      minLength: {
+                        value: 3,
+                        message: "Minimum 3 characters required",
+                      },
                     })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter your full name"
                   />
                   {errors.full_name && (
@@ -113,6 +139,7 @@ function RegistrationForm() {
                   )}
                 </div>
 
+                {/* Email */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Email Address *
@@ -126,7 +153,7 @@ function RegistrationForm() {
                         message: "Invalid email format",
                       },
                     })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter your email"
                   />
                   {errors.email && (
@@ -136,19 +163,20 @@ function RegistrationForm() {
                   )}
                 </div>
 
+                {/* Mobile */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Mobile Number *
                   </label>
                   <input
                     {...register("mobile", {
-                      required: "Mobile is required",
+                      required: "Mobile number is required",
                       pattern: {
                         value: /^[6-9]\d{9}$/,
-                        message: "Enter valid mobile number",
+                        message: "Enter valid 10-digit mobile number",
                       },
                     })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter your mobile number"
                   />
                   {errors.mobile && (
@@ -158,6 +186,7 @@ function RegistrationForm() {
                   )}
                 </div>
 
+                {/* Age */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Age *
@@ -166,10 +195,10 @@ function RegistrationForm() {
                     type="number"
                     {...register("age", {
                       required: "Age is required",
-                      min: { value: 13, message: "Min age 13" },
-                      max: { value: 100, message: "Max age 100" },
+                      min: { value: 13, message: "Minimum age is 13" },
+                      max: { value: 100, message: "Maximum age is 100" },
                     })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter your age"
                   />
                   {errors.age && (
@@ -179,13 +208,14 @@ function RegistrationForm() {
                   )}
                 </div>
 
+                {/* Gender */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Gender *
                   </label>
                   <select
                     {...register("gender", { required: "Gender is required" })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select gender</option>
                     <option value="Male">Male</option>
@@ -199,6 +229,7 @@ function RegistrationForm() {
                   )}
                 </div>
 
+                {/* Password */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Password *
@@ -207,9 +238,17 @@ function RegistrationForm() {
                     type="password"
                     {...register("password", {
                       required: "Password is required",
-                      minLength: { value: 6, message: "Minimum 6 characters" },
+                      minLength: {
+                        value: 6,
+                        message: "Minimum 6 characters",
+                      },
+                      pattern: {
+                        value: /^(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?&])/,
+                        message:
+                          "Must contain uppercase, number & special character",
+                      },
                     })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter your password"
                   />
                   {errors.password && (
@@ -222,16 +261,20 @@ function RegistrationForm() {
             </div>
           )}
 
+          {/* Step 2 */}
           {step === 2 && (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Education Level */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Education Level *
                   </label>
                   <select
-                    {...register("education_level", { required: true })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    {...register("education_level", {
+                      required: "Education level is required",
+                    })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select education level</option>
                     <option value="10th">10th Standard</option>
@@ -241,31 +284,35 @@ function RegistrationForm() {
                   </select>
                   {errors.education_level && (
                     <p className="text-red-500 text-sm mt-1">
-                      Education level is required
+                      {errors.education_level.message}
                     </p>
                   )}
                 </div>
 
+                {/* Preferred Language */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Preferred Language *
                   </label>
                   <input
-                    {...register("preferred_language", { required: true })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder="e.g., English, Hindi, etc."
+                    {...register("preferred_language", {
+                      required: "Language is required",
+                    })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g., English, Hindi"
                   />
                   {errors.preferred_language && (
                     <p className="text-red-500 text-sm mt-1">
-                      Language is required
+                      {errors.preferred_language.message}
                     </p>
                   )}
                 </div>
               </div>
 
+              {/* Career Interests */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Career Interests * (Select multiple)
+                  Career Interests * (Select at least one)
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {[
@@ -281,7 +328,10 @@ function RegistrationForm() {
                       <input
                         type="checkbox"
                         value={interest}
-                        {...register("career_interest", { required: true })}
+                        {...register("career_interest", {
+                          validate: (value) =>
+                            value?.length > 0 || "Select at least one interest",
+                        })}
                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                       />
                       <span className="text-sm text-gray-700">{interest}</span>
@@ -290,16 +340,18 @@ function RegistrationForm() {
                 </div>
                 {errors.career_interest && (
                   <p className="text-red-500 text-sm mt-1">
-                    Select at least one interest
+                    {errors.career_interest.message}
                   </p>
                 )}
               </div>
             </div>
           )}
 
+          {/* Step 3 */}
           {step === 3 && (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Location */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Location *
@@ -308,7 +360,7 @@ function RegistrationForm() {
                     {...register("location", {
                       required: "Location is required",
                     })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter your city/state"
                   />
                   {errors.location && (
@@ -318,11 +370,11 @@ function RegistrationForm() {
                   )}
                 </div>
 
+                {/* Profile Picture */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Profile Picture:
                   </label>
-
                   <input
                     type="file"
                     id="profile-picture"
@@ -338,42 +390,17 @@ function RegistrationForm() {
                     })}
                     className="hidden"
                     accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        console.log(file);
-                        // setValue("profile_picture", file);
-                        setimgurl(URL.createObjectURL(file));
-                      }
-                      register("profile_picture").onChange(e);
-                    }}
                   />
-
                   <label htmlFor="profile-picture" className="cursor-pointer">
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors duration-200">
-                      {imgurl && imgurl != "no file selected." ? (
-                        <div className="text-gray-500">
-                          <img
-                            src={imgurl}
-                            alt="Click to upload profile picture"
-                            className="mx-auto h-32  w-32 rounded object-cover"
-                          />
-                        </div>
+                      {imgurl && imgurl !== "no file selected." ? (
+                        <img
+                          src={imgurl}
+                          alt="Profile Preview"
+                          className="mx-auto h-32 w-32 rounded object-cover"
+                        />
                       ) : (
                         <div className="text-gray-500">
-                          <svg
-                            className="mx-auto h-12 w-12 mb-2"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                            />
-                          </svg>
                           <p className="text-sm">
                             Click to upload profile picture
                           </p>
@@ -384,7 +411,6 @@ function RegistrationForm() {
                       )}
                     </div>
                   </label>
-
                   {errors.profile_picture && (
                     <p className="text-red-500 text-sm mt-1">
                       {errors.profile_picture.message}
@@ -401,7 +427,7 @@ function RegistrationForm() {
               <button
                 type="button"
                 onClick={prevStep}
-                className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-medium"
+                className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium"
               >
                 ← Previous
               </button>
@@ -410,14 +436,14 @@ function RegistrationForm() {
               <button
                 type="button"
                 onClick={nextStep}
-                className="ml-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg"
+                className="ml-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium shadow-lg"
               >
                 Next Step →
               </button>
             ) : (
               <button
                 type="submit"
-                className="ml-auto px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-200 font-medium shadow-lg"
+                className="ml-auto px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-medium shadow-lg"
               >
                 Complete Registration
               </button>

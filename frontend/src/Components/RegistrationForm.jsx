@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 function RegistrationForm() {
   const [step, setStep] = useState(1);
   const {
+    setValue,
     register,
     handleSubmit,
     watch,
@@ -21,12 +22,17 @@ function RegistrationForm() {
   const all = watch();
 
   useEffect(() => {
-    const file = all.profile_picture?.[0];
-    if (file) {
-      setimgurl(file.name);
-    } else {
-      setimgurl("No file selected");
-    }
+    // const file = all.profile_picture;
+    // console.log("from use efect :- ", file);
+    // if (file && file.length > 0) {
+    //   if (file) {
+    //     setimgurl(URL.createObjectURL(file));
+    //     console.log("has file");
+    //     console.log("imgurl :- ", imgurl);
+    //   } else {
+    //     setimgurl("No file selected.");
+    //   }
+    // }
   }, [all.profile_picture]);
 
   // setimgurl(
@@ -60,10 +66,11 @@ function RegistrationForm() {
             {steps.map((stepItem, index) => (
               <div key={stepItem.number} className="flex items-center">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${step >= stepItem.number
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-500"
-                    }`}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${
+                    step >= stepItem.number
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 text-gray-500"
+                  }`}
                 >
                   {stepItem.number}
                 </div>
@@ -74,8 +81,9 @@ function RegistrationForm() {
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`w-16 h-1 mx-4 ${step > stepItem.number ? "bg-blue-600" : "bg-gray-200"
-                      }`}
+                    className={`w-16 h-1 mx-4 ${
+                      step > stepItem.number ? "bg-blue-600" : "bg-gray-200"
+                    }`}
                   />
                 )}
               </div>
@@ -333,19 +341,24 @@ function RegistrationForm() {
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
+                        console.log(file);
+                        // setValue("profile_picture", file);
                         setimgurl(URL.createObjectURL(file));
                       }
+                      register("profile_picture").onChange(e);
                     }}
                   />
 
                   <label htmlFor="profile-picture" className="cursor-pointer">
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors duration-200">
-                      {imgurl && imgurl !== "no file selected." ? (
-                        <img
-                          src={imgurl}
-                          alt="Click to upload profile picture"
-                          className="mx-auto h-24 w-24 rounded-full object-cover"
-                        />
+                      {imgurl && imgurl != "no file selected." ? (
+                        <div className="text-gray-500">
+                          <img
+                            src={imgurl}
+                            alt="Click to upload profile picture"
+                            className="mx-auto h-32  w-32 rounded object-cover"
+                          />
+                        </div>
                       ) : (
                         <div className="text-gray-500">
                           <svg
@@ -361,8 +374,12 @@ function RegistrationForm() {
                               d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                             />
                           </svg>
-                          <p className="text-sm">Click to upload profile picture</p>
-                          <p className="text-xs text-gray-400 mt-1">JPG, PNG up to 2MB</p>
+                          <p className="text-sm">
+                            Click to upload profile picture
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            JPG, PNG up to 2MB
+                          </p>
                         </div>
                       )}
                     </div>

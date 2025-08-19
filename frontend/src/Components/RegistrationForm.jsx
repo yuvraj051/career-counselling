@@ -4,14 +4,27 @@ import { useForm } from "react-hook-form";
 function RegistrationForm() {
   const [step, setStep] = useState(1);
   const [imgurl, setImgurl] = useState("no file selected.");
-
+  const [user, setUser] = useState({});
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("user"));
+    setUser(userData);
+    console.log(userData);
+    console.log(user);
+  }, []);
   const {
     register,
     handleSubmit,
     watch,
     trigger,
     formState: { errors },
-  } = useForm({ mode: "onChange" });
+  } = useForm({
+    mode: "onChange",
+    defaultValues: {
+      full_name: user.name,
+      email: user.email,
+      profile_picture: user.picture,
+    },
+  });
 
   const all = watch();
 

@@ -26,13 +26,14 @@ const WelcomePage = () => {
 
   const handleLogin = (response) => {
     const decoded = jwtDecode(response.credential);
+    console.log("User Info:", response);
     console.log("User Info:", decoded);
 
     // Optional: Save to localStorage
     localStorage.setItem("user", JSON.stringify(decoded));
 
     // Redirect to signup
-    navigate("/dashboard");
+    navigate("/signup");
   };
   // const fetchData = async () => {
   //   try {

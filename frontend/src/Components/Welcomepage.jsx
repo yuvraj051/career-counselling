@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import bgsvg from "../assets/login_image.svg";
 import "../welcomepage.css";
+import { useUser } from "../Context/UserContext";
 const WelcomePage = () => {
   const navigate = useNavigate();
+  const user = useUser();
   const [name, setname] = useState("");
   useEffect(() => {
     /* global google */

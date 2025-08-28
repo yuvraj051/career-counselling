@@ -9,8 +9,11 @@ function RegistrationForm() {
     const userData = JSON.parse(localStorage.getItem("user"));
     setUser(userData);
     console.log(userData);
+  }, []);
+  useEffect(() => {
     console.log(user);
   }, []);
+
   const {
     register,
     handleSubmit,
@@ -20,7 +23,7 @@ function RegistrationForm() {
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      full_name: user.name,
+      full_name: user.name ? user.name : "yuvraj",
       email: user.email,
       profile_picture: user.picture,
     },

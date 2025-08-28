@@ -18,6 +18,7 @@ function RegistrationForm() {
   const onSubmit = (data) => {
     console.log("Form Data:", data);
     alert("Registration Submitted!");
+    navigate("/Dashboard");
   };
 
   // Image Preview
@@ -81,11 +82,10 @@ function RegistrationForm() {
             {steps.map((stepItem, index) => (
               <div key={stepItem.number} className="flex items-center">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${
-                    step >= stepItem.number
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-200 text-gray-500"
-                  }`}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${step >= stepItem.number
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200 text-gray-500"
+                    }`}
                 >
                   {stepItem.number}
                 </div>
@@ -96,9 +96,8 @@ function RegistrationForm() {
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`w-16 h-1 mx-4 ${
-                      step > stepItem.number ? "bg-blue-600" : "bg-gray-200"
-                    }`}
+                    className={`w-16 h-1 mx-4 ${step > stepItem.number ? "bg-blue-600" : "bg-gray-200"
+                      }`}
                   />
                 )}
               </div>

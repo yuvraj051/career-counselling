@@ -13,8 +13,8 @@ function App() {
     <UserProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<Login />} />
-          {/* <Route path="/" element={<Welcomepage />} /> */}
+          {/* <Route path="/" element={<Login />} /> */}
+          <Route path="/" element={<Welcomepage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/signup" element={<RegistrationForm />} />
           <Route path="/test" element={<Test />} />

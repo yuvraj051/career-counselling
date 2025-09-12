@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useUser } from "../Context/UserContext";
+import axios from "axios"; // API કૉલ માટે
+import { useNavigate } from "react-router-dom"; // સફળતાપૂર્વક સબમિટ થયા પછી રીડાયરેક્ટ કરવા માટે
 
 function RegistrationForm() {
   const [step, setStep] = useState(1);
-  const [imgurl, setImgurl] = useState("no file selected.");
-  const [user, setUser] = useState({});
-  useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem("user"));
-    setUser(userData);
-    console.log(userData);
-  }, []);
-  useEffect(() => {
-    console.log(user);
-  }, []);
+  const { user } = useUser();
+  const navigate = useNavigate();
+
+  // પ્રોફાઇલ પિક્ચરના પ્રિવ્યૂ માટે સ્ટેટ
+  const [imgurl, setImgurl] = useState(user?.picture || "no file selected.");
 
   const {
     register,
@@ -23,31 +21,73 @@ function RegistrationForm() {
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      full_name: user.name ? user.name : "yuvraj",
-      email: user.email,
-      profile_picture: user.picture,
+      full_name: user?.name || "",
+      email: user?.email || "",
     },
   });
 
   const all = watch();
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
-    alert("Registration Submitted!");
-    navigate("/Dashboard");
+  // ફોર્મ સબમિટ કરવા અને API પર ડેટા મોકલવા માટેનું ફંક્શન
+  const onSubmit = async (data) => {
+    // ફાઇલ અપલોડ માટે FormData ઓબ્જેક્ટ બનાવવો જરૂરી છે
+    const formData = new FormData();
+
+    // બધા ટેક્સ્ટ-આધારિત ડેટાને formData માં ઉમેરો
+    formData.append("full_name", data.full_name);
+    formData.append("email", data.email);
+    formData.append("mobile", data.mobile);
+    formData.append("password", data.password);
+    formData.append("age", data.age);
+    formData.append("gender", data.gender);
+    formData.append("education_level", data.education_level);
+    formData.append("preferred_language", data.preferred_language);
+    formData.append("location", data.location);
+
+    // career_interest (array) ને formData માં ઉમેરો
+    if (data.career_interest && data.career_interest.length > 0) {
+      data.career_interest.forEach((interest) => {
+        formData.append("career_interest", interest);
+      });
+    }
+
+    // profile_picture (file) ને formData માં ઉમેરો
+    if (data.profile_picture && data.profile_picture.length > 0) {
+      formData.append("profile_picture", data.profile_picture[0]);
+    }
+
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/user/",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("Form Data Submitted:", response.data);
+      alert("Registration Submitted Successfully!");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error(
+        "Error submitting form:",
+        error.response?.data || error.message
+      );
+      alert("Registration Failed. Please check the details and try again.");
+    }
   };
 
-  // Image Preview
+  // જ્યારે યુઝર નવી ફાઇલ પસંદ કરે ત્યારે ઇમેજ પ્રિવ્યૂ અપડેટ કરો
   useEffect(() => {
     const file = all.profile_picture?.[0];
     if (file) {
       setImgurl(URL.createObjectURL(file));
-    } else {
-      setImgurl("no file selected.");
     }
   }, [all.profile_picture]);
 
-  // Step change with validation
+  // વેલિડેશન સાથે નેક્સ્ટ સ્ટેપ પર જવા માટેનું ફંક્શન
   const nextStep = async () => {
     let currentStepFields = [];
     if (step === 1)
@@ -71,6 +111,7 @@ function RegistrationForm() {
     if (isStepValid) setStep((prev) => prev + 1);
   };
 
+  // પાછલા સ્ટેપ પર જવા માટેનું ફંક્શન
   const prevStep = () => setStep((prev) => prev - 1);
 
   const steps = [
@@ -98,10 +139,11 @@ function RegistrationForm() {
             {steps.map((stepItem, index) => (
               <div key={stepItem.number} className="flex items-center">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${step >= stepItem.number
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-500"
-                    }`}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${
+                    step >= stepItem.number
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 text-gray-500"
+                  }`}
                 >
                   {stepItem.number}
                 </div>
@@ -112,8 +154,9 @@ function RegistrationForm() {
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`w-16 h-1 mx-4 ${step > stepItem.number ? "bg-blue-600" : "bg-gray-200"
-                      }`}
+                    className={`w-16 h-1 mx-4 ${
+                      step > stepItem.number ? "bg-blue-600" : "bg-gray-200"
+                    }`}
                   />
                 )}
               </div>
@@ -123,7 +166,7 @@ function RegistrationForm() {
 
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="px-8 pb-8">
-          {/* Step 1 */}
+          {/* Step 1: Personal Information */}
           {step === 1 && (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -135,14 +178,6 @@ function RegistrationForm() {
                   <input
                     {...register("full_name", {
                       required: "Full Name is required",
-                      pattern: {
-                        value: /^[A-Za-z\s]+$/,
-                        message: "Only alphabets allowed",
-                      },
-                      minLength: {
-                        value: 3,
-                        message: "Minimum 3 characters required",
-                      },
                     })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter your full name"
@@ -257,11 +292,6 @@ function RegistrationForm() {
                         value: 6,
                         message: "Minimum 6 characters",
                       },
-                      pattern: {
-                        value: /^(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?&])/,
-                        message:
-                          "Must contain uppercase, number & special character",
-                      },
                     })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter your password"
@@ -276,7 +306,7 @@ function RegistrationForm() {
             </div>
           )}
 
-          {/* Step 2 */}
+          {/* Step 2: Educational Details */}
           {step === 2 && (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -362,7 +392,7 @@ function RegistrationForm() {
             </div>
           )}
 
-          {/* Step 3 */}
+          {/* Step 3: Additional Information */}
           {step === 3 && (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -396,7 +426,7 @@ function RegistrationForm() {
                     {...register("profile_picture", {
                       validate: (files) => {
                         const file = files?.[0];
-                        if (!file) return true;
+                        if (!file) return true; // Optional field
                         if (!["image/jpeg", "image/png"].includes(file.type))
                           return "Only JPG/PNG allowed";
                         if (file.size > 2 * 1024 * 1024) return "Max 2MB";
@@ -404,7 +434,7 @@ function RegistrationForm() {
                       },
                     })}
                     className="hidden"
-                    accept="image/*"
+                    accept="image/jpeg, image/png"
                   />
                   <label htmlFor="profile-picture" className="cursor-pointer">
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors duration-200">
@@ -412,7 +442,7 @@ function RegistrationForm() {
                         <img
                           src={imgurl}
                           alt="Profile Preview"
-                          className="mx-auto h-32 w-32 rounded object-cover"
+                          className="mx-auto h-32 w-32 rounded-full object-cover"
                         />
                       ) : (
                         <div className="text-gray-500">

@@ -1,14 +1,14 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import bgsvg from "../assets/login_image.svg";
 import "../welcomepage.css";
-import { useUser } from "../Context/UserContext";
+import { useUser } from "../Context/UserContext"; // Context import કરો
+
 const WelcomePage = () => {
   const navigate = useNavigate();
-  const user = useUser();
-  const [name, setname] = useState("");
+  const { loginUser } = useUser(); // Context માંથી loginUser ફંક્શન મેળવો
+
   useEffect(() => {
     /* global google */
     try {
@@ -22,48 +22,27 @@ const WelcomePage = () => {
         {}
       );
     } catch (error) {
-      alert("please check your network...");
+      alert("Please check your network...");
     }
   }, []);
 
   const handleLogin = (response) => {
     const decoded = jwtDecode(response.credential);
-    console.log("User Info:", response);
-    console.log("User Info:", decoded);
+    console.log("User Info Decoded:", decoded);
 
-    // Optional: Save to localStorage
-    localStorage.setItem("user", JSON.stringify(decoded));
+    // Context માં user data set કરો
+    loginUser(decoded);
 
-    // Redirect to signup
+    // Registration page પર redirect કરો
     navigate("/signup");
   };
-  // const fetchData = async () => {
-  //   try {
-  //     const response = await axios.get(
-  //       "http://127.0.0.1:8000/api/students/688102a9e37b53b954fd1d3e",
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
-  //     console.log(response.data.name);
-  //     setname(response.data.name);
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
+
   return (
     <>
-      {" "}
-      <div></div>
       <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
         <div className="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
           <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
-            <div>{/* <p>{name}</p> */}</div>
+            <div></div>
             <div className="mt-12 flex flex-col items-center">
               <h1 className="text-2xl xl:text-3xl font-extrabold">Sign up</h1>
               <div className="w-full flex-1 mt-8">

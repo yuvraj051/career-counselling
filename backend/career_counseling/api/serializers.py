@@ -16,9 +16,9 @@ class UserProfileSerializer(DocumentSerializer):
             )
         ]
     )
-    
-    # Ensure you use "serializers.StringField" here
-    mobile = serializers.StringField(
+
+    # Ensure you use "serializers.CharField" here
+    mobile = serializers.CharField(
         required=True,
         max_length=15,
         validators=[

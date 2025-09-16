@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-
+from dotenv import load_dotenv
+import os
+import cloudinary
 import mongoengine
 
 
@@ -138,3 +140,15 @@ mongoengine.connect(
 
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+#load .env file
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+load_dotenv(os.path.join(BASE_DIR, '.env'))
+
+# Cloudinary Configuration
+cloudinary.config(
+  cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME'),
+  api_key = os.getenv('CLOUDINARY_API_KEY'),
+  api_secret = os.getenv('CLOUDINARY_API_SECRET'),
+  secure = True
+)

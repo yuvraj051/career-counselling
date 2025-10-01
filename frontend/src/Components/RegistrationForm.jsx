@@ -58,7 +58,7 @@ function RegistrationForm() {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/user/",
+        "http://127.0.0.1:8000/api/users/",
         formData,
         {
           headers: {
@@ -176,6 +176,7 @@ function RegistrationForm() {
                     Full Name *
                   </label>
                   <input
+                    readOnly
                     {...register("full_name", {
                       required: "Full Name is required",
                     })}
@@ -195,6 +196,7 @@ function RegistrationForm() {
                     Email Address *
                   </label>
                   <input
+                    readOnly
                     type="email"
                     {...register("email", {
                       required: "Email is required",

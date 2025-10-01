@@ -15,7 +15,7 @@ from .serializers import UserProfileSerializer
 from django.conf import settings
 import os
 
-class UserProfileListCreateView(APIView):
+class UserView(APIView):
     # ફાઇલ અને ફોર્મ ડેટાને હેન્ડલ કરવા માટે પાર્સર્સ ઉમેરો
     parser_classes = [MultiPartParser, FormParser]
     def post(self, request, *args, **kwargs):
@@ -57,7 +57,59 @@ class UserProfileListCreateView(APIView):
         users = UserProfile.objects()
         serializer = UserProfileSerializer(users, many=True)
         return Response(serializer.data)
-# ... UserProfileDetailView (GET by ID, PUT, DELETE) માટેનો કોડ પણ અહીં અપડેટ કરી શકાય છે...
+# ... UserProfileDetailView (GET by ID, PUT, DELETE) 
+#more api for get , put, delete operations can be added here as needed
+class UserDetailView(APIView):
+    def delete(self, request, id):
+        try:
+            user = UserProfile.objects.get(id=id)
+            user.delete()
+            return Response(
+    {"message": "User deleted successfully."},
+    status=status.HTTP_200_OK
+)
+        except UserProfile.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    def put(self, request, id):
+        try:
+            user = UserProfile.objects.get(id=id)
+            # Make a mutable copy of the request data
+            mutable_data = request.data.copy()
+            
+            # Check if an image file is part of the request
+            if 'profile_picture' in request.FILES:
+                image_file = request.FILES['profile_picture']
+                
+                try:
+                    # Upload the file to Cloudinary
+                    upload_result = cloudinary.uploader.upload(image_file)
+                    
+                    # Extract the secure URL of the uploaded image
+                    image_url = upload_result.get('secure_url')
+                    
+                    # Replace the file object with the Cloudinary URL
+                    mutable_data['profile_picture'] = image_url
+                    
+                except Exception as e:
+                    return Response(
+                        {"error": f"Failed to upload image: {str(e)}"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+            serializer = UserProfileSerializer(user, data=mutable_data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except UserProfile.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    def get(self, request, email):
+        try:
+            user = UserProfile.objects.get(email=email)
+            serializer = UserProfileSerializer(user)
+            return Response(serializer.data)
+        except UserProfile.DoesNotExist:
+            return Response({"message": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
 class StudentListCreateView(APIView):
     def get(self, request):

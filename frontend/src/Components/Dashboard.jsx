@@ -339,7 +339,7 @@ export default function App() {
   const callGeminiAPI = async (prompt, retries = 3, delay = 1000) => {
     let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
     const payload = { contents: chatHistory };
-    const apiKey = ""; // Leave empty
+    const apiKey = "AIzaSyAUnRicffsHnEi62DblQ1u9I7Gfn_vWzQo"; // Leave empty
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
     try {

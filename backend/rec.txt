@@ -2,7 +2,7 @@ python -m venv venv
 pip install Django
 pip install djangorestframework
 pip install mongoengine
-pip install djangorestframework-mongoengine
+pip install django-rest-framework-mongoengine
 pip install django-cors-headers
 pip install cloudinary
 pip install python-dotenv

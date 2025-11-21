@@ -137,11 +137,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # mongodb connection
 mongoengine.connect(
-    host='mongodb://mongo:mongo@careercounselling.knwa0dn.mongodb.net/ccdb?retryWrites=true&w=majority'
+    host='mongodb+srv://mongo:mongo@careercounselling.knwa0dn.mongodb.net/ccdb?retryWrites=true&w=majority'
+    # host='mongodb://mongo:mongo@careercounselling.knwa0dn.mongodb.net/ccdb?retryWrites=true&w=majority'
 )
 
 
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_HEADERS = [
+    "content-type",
+    "authorization",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+
 
 #load .env file
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

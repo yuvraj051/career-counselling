@@ -26,83 +26,12 @@ import {
   Sun,
 } from "lucide-react";
 
-// --- Mock Data ---
-const userData = {
-  name: "Alex Doe",
-  avatarUrl: "https://placehold.co/100x100/E2E8F0/4A5568?text=AD",
-};
-
-const stats = [
-  {
-    id: 1,
-    label: "Assessments Taken",
-    value: "4",
-    icon: FileText,
-    color: "bg-blue-500",
-  },
-  {
-    id: 2,
-    label: "Career Paths Explored",
-    value: "8",
-    icon: Briefcase,
-    color: "bg-green-500",
-  },
-  {
-    id: 3,
-    label: "Goals Set",
-    value: "3",
-    icon: Target,
-    color: "bg-yellow-500",
-  },
-  {
-    id: 4,
-    label: "Upcoming Sessions",
-    value: "2",
-    icon: Calendar,
-    color: "bg-indigo-500",
-  },
-];
-
-const jobRecommendations = [
-  {
-    id: 1,
-    title: "Frontend Developer",
-    company: "Innovate Inc.",
-    location: "Remote",
-    match: 92,
-    icon: "https://placehold.co/40x40/7F9CF5/FFFFFF?text=I",
-  },
-  {
-    id: 2,
-    title: "UX/UI Designer",
-    company: "Creative Solutions",
-    location: "New York, NY",
-    match: 88,
-    icon: "https://placehold.co/40x40/F6AD55/FFFFFF?text=C",
-  },
-  {
-    id: 3,
-    title: "Product Manager",
-    company: "TechForward",
-    location: "San Francisco, CA",
-    match: 85,
-    icon: "https://placehold.co/40x40/68D391/FFFFFF?text=T",
-  },
-];
-
-const userSkills = {
-  labels: [
-    "Problem Solving",
-    "Communication",
-    "Leadership",
-    "Creativity",
-    "Technical",
-  ],
-  data: [85, 90, 70, 80, 75],
-};
+// 💡 તમારા UserContext માંથી useUser hook import કરો
+import { useUser } from "../Context/UserContext";
 
 // --- Reusable Components ---
 
+// StatCard અને JobCard જેમ છે તેમ જ રહેશે.
 const StatCard = ({ item }) => (
   <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center space-x-4">
     <div className={`p-3 rounded-full ${item.color}`}>
@@ -213,7 +142,8 @@ const Sidebar = ({ isSidebarOpen, setSidebarOpen }) => {
   );
 };
 
-const Header = ({ setSidebarOpen, theme, toggleTheme }) => (
+// Header ને dynamic userData prop pass કરવામાં આવ્યો છે
+const Header = ({ setSidebarOpen, theme, toggleTheme, userData }) => (
   <header className="bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-lg sticky top-0 z-30 p-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
     <div className="flex items-center space-x-4">
       <button
@@ -254,13 +184,13 @@ const Header = ({ setSidebarOpen, theme, toggleTheme }) => (
       </button>
       <div className="flex items-center space-x-2">
         <img
-          src={userData.avatarUrl}
-          alt={userData.name}
+          src={userData.avatarUrl} // Dynamic
+          alt={userData.avatarUrl} // Dynamic
           className="w-10 h-10 rounded-full"
         />
         <div className="hidden lg:block">
           <p className="font-semibold text-gray-800 dark:text-white">
-            {userData.name}
+            {userData.name} {/* Dynamic */}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400">
             Premium User
@@ -310,7 +240,23 @@ const AIModal = ({ isOpen, onClose, title, content, isLoading }) => {
 };
 
 export default function App() {
+  // Context માંથી user object મેળવો
+  const { user } = useUser();
+
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+  // --- Dynamic State Initialization ---
+  const [userData, setUserData] = useState({
+    name: user.name,
+    avatarUrl: user.profile_picture,
+  });
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+
+  // Stats અને Recommendations માટે ખાલી Array/Objects
+  const [stats, setStats] = useState([]);
+  const [jobRecommendations, setJobRecommendations] = useState([]);
+  const [userSkills, setUserSkills] = useState({ labels: [], data: [] });
+
   const [welcomeMessage, setWelcomeMessage] = useState(
     "Your journey to a fulfilling career starts now. Let's explore your potential."
   );
@@ -335,11 +281,12 @@ export default function App() {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  // --- Gemini API Call Function with Exponential Backoff ---
+  // --- API Call Functions ---
+
   const callGeminiAPI = async (prompt, retries = 3, delay = 1000) => {
     let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
     const payload = { contents: chatHistory };
-    const apiKey = "AIzaSyAUnRicffsHnEi62DblQ1u9I7Gfn_vWzQo"; // Leave empty
+    const apiKey = "AIzaSyAUnRicffsHnEi62DblQ1u9I7Gfn_vWzQo";
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
     try {
@@ -366,9 +313,112 @@ export default function App() {
     }
   };
 
+  // 💡 User Context માંથી ID લઈને API call કરવી
+  const fetchUserData = async () => {
+    if (!user || !user.id) {
+      setIsLoadingUser(false);
+      return;
+    }
+
+    setIsLoadingUser(true);
+
+    const userId = user.id;
+    const apiUrl = `http://127.0.0.1:8000/api/users/${userId}/`; // 👈 Dynamic ID
+
+    try {
+      const response = await fetch(apiUrl);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Assume API returns appropriate fields
+      setUserData({
+        name: data.full_name || data.name || "User Name",
+        avatarUrl: user.profile_picture,
+      });
+    } catch (error) {
+      console.error("Failed to fetch user data:", error);
+    } finally {
+      setIsLoadingUser(false);
+    }
+  };
+
+  // 💡 Dashboard Data Fetching (Mocking for now, replace with your API call)
+  const fetchDashboardData = async () => {
+    if (!user || !user.id) return;
+
+    // Replace this with your actual API call for stats, jobs, skills
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    setStats([
+      {
+        id: 1,
+        label: "Assessments Taken",
+        value: "9",
+        icon: FileText,
+        color: "bg-blue-500",
+      },
+      {
+        id: 2,
+        label: "Career Paths Explored",
+        value: "12",
+        icon: Briefcase,
+        color: "bg-green-500",
+      },
+      {
+        id: 3,
+        label: "Goals Set",
+        value: "5",
+        icon: Target,
+        color: "bg-yellow-500",
+      },
+      {
+        id: 4,
+        label: "Upcoming Sessions",
+        value: "1",
+        icon: Calendar,
+        color: "bg-indigo-500",
+      },
+    ]);
+
+    setJobRecommendations([
+      {
+        id: 1,
+        title: "Full Stack Developer",
+        company: "WebCorp Solutions",
+        location: "Pune, India",
+        match: 95,
+        icon: "https://placehold.co/40x40/7F9CF5/FFFFFF?text=W",
+      },
+      {
+        id: 2,
+        title: "Data Scientist",
+        company: "Analytics Hub",
+        location: "Bangalore, India",
+        match: 90,
+        icon: "https://placehold.co/40x40/F6AD55/FFFFFF?text=A",
+      },
+    ]);
+
+    setUserSkills({
+      labels: [
+        "Coding",
+        "Problem Solving",
+        "Teamwork",
+        "Analytics",
+        "Creativity",
+      ],
+      data: [90, 85, 92, 78, 88],
+    });
+  };
+
   // --- Feature Handlers ---
   const generateWelcomeMessage = async () => {
     setIsLoadingWelcome(true);
+    // Use dynamic userData.name for the prompt
     const prompt = `Generate a short, motivational welcome message (2-3 sentences) for a user named ${userData.name} on their career counseling dashboard. Mention their progress (they have completed some assessments) and suggest they explore job recommendations next.`;
     const message = await callGeminiAPI(prompt);
     setWelcomeMessage(message);
@@ -380,6 +430,7 @@ export default function App() {
     setModalContent("");
     setIsModalLoading(true);
     setIsModalOpen(true);
+    // Use dynamic userSkills for the prompt
     const prompt = `Based on these skills: ${userSkills.labels.join(
       ", "
     )}, generate 3 diverse and interesting career path ideas. For each idea, provide a one-sentence description and list 2-3 key responsibilities. Format the response in HTML with each career path in a div with a bolded h4 title.`;
@@ -393,15 +444,34 @@ export default function App() {
     setModalContent("");
     setIsModalLoading(true);
     setIsModalOpen(true);
-    const prompt = `Generate 5 common but important interview questions for a ${jobRecommendations[0].title} role. Include one behavioral question. Format the response as an HTML ordered list.`;
+
+    if (jobRecommendations.length === 0) {
+      setModalContent(
+        "No job recommendations available to generate questions."
+      );
+      setIsModalLoading(false);
+      return;
+    }
+
+    const firstJobTitle = jobRecommendations[0].title;
+    const prompt = `Generate 5 common but important interview questions for a ${firstJobTitle} role. Include one behavioral question. Format the response as an HTML ordered list.`;
     const questions = await callGeminiAPI(prompt);
     setModalContent(questions);
     setIsModalLoading(false);
   };
 
+  // 💡 user object બદલાય ત્યારે API call ફરીથી કરવી
   useEffect(() => {
-    generateWelcomeMessage();
-  }, []);
+    fetchUserData();
+    fetchDashboardData();
+    // generateWelcomeMessage માં userData.name નો ઉપયોગ થાય છે, તેથી તે પણ user પર આધારિત છે.
+  }, [user]);
+
+  useEffect(() => {
+    if (!isLoadingUser) {
+      generateWelcomeMessage();
+    }
+  }, [userData.name, isLoadingUser]);
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900/95 text-gray-900 dark:text-gray-100 min-h-screen flex font-sans">
@@ -411,11 +481,12 @@ export default function App() {
           setSidebarOpen={setSidebarOpen}
           theme={theme}
           toggleTheme={toggleTheme}
+          userData={userData} //{/* Dynamic Data Pass */}
         />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
           <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-8 rounded-3xl mb-8 shadow-2xl">
             <h2 className="text-3xl font-bold mb-2">
-              Welcome back, {userData.name}!
+              Welcome back, {userData.name}! {/* Dynamic */}
             </h2>
             {isLoadingWelcome ? (
               <div className="h-6 bg-white/30 rounded-full w-3/4 animate-pulse"></div>
@@ -425,9 +496,15 @@ export default function App() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {stats.map((item) => (
-              <StatCard key={item.id} item={item} />
-            ))}
+            {stats.length > 0 // Check if data is loaded
+              ? stats.map((item) => <StatCard key={item.id} item={item} />)
+              : // Loading State for Stats (Optional)
+                [1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg h-24 animate-pulse"
+                  ></div>
+                ))}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
@@ -445,9 +522,15 @@ export default function App() {
                   </a>
                 </div>
                 <div className="space-y-4">
-                  {jobRecommendations.map((job) => (
-                    <JobCard key={job.id} job={job} />
-                  ))}
+                  {jobRecommendations.length > 0 ? ( // Check if data is loaded
+                    jobRecommendations.map((job) => (
+                      <JobCard key={job.id} job={job} />
+                    ))
+                  ) : (
+                    <p className="text-gray-500 dark:text-gray-400">
+                      No job recommendations yet.
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -464,6 +547,7 @@ export default function App() {
                   <button
                     onClick={generateInterviewQuestions}
                     className="mt-4 sm:mt-0 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 px-4 py-2 rounded-lg font-semibold hover:bg-indigo-200 dark:hover:bg-indigo-900 transition-colors duration-300 flex items-center"
+                    disabled={jobRecommendations.length === 0} // Disable if no job data
                   >
                     <Sparkles className="mr-2" size={18} /> ✨ Practice Now
                   </button>
@@ -483,6 +567,7 @@ export default function App() {
                 <button
                   onClick={generateCareerIdeas}
                   className="bg-indigo-600 text-white w-full flex items-center justify-center py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors duration-300"
+                  disabled={userSkills.labels.length === 0} // Disable if no skill data
                 >
                   <Sparkles className="mr-2" size={18} /> ✨ Get AI Suggestions
                 </button>

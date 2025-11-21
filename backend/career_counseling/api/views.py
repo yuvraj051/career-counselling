@@ -107,6 +107,7 @@ class UserDetailView(APIView):
         try:
             user = UserProfile.objects.get(email=email)
             serializer = UserProfileSerializer(user)
+            print(serializer.data)
             return Response(serializer.data)
         except UserProfile.DoesNotExist:
             return Response({"message": "User not found."}, status=status.HTTP_404_NOT_FOUND)

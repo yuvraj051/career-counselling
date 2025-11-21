@@ -137,7 +137,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # mongodb connection
 mongoengine.connect(
-    host='mongodb+srv://mongo:mongo@careercounselling.knwa0dn.mongodb.net/ccdb?retryWrites=true&w=majority'
+    host='mongodb://mongo:mongo@careercounselling.knwa0dn.mongodb.net/ccdb?retryWrites=true&w=majority'
 )
 
 
